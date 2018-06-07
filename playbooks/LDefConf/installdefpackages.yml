@@ -1,0 +1,21 @@
+#Installing Centos Default Packeges
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Date 04/06/2018
+#Version 1.0.0
+
+- hosts: centos
+  tasks:
+  - name: Install Centos Default Packages
+    package:
+       name: "{{ item }}"
+       state: present
+    with_items:
+       - mlocate
+       - wget
+       - ntpdate
+       - net-tools
+       - bind-utils
+       - lrzsz
+       - lsof
+       - mtr
+       - tcpdump

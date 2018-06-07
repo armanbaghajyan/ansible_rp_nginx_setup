@@ -1,0 +1,55 @@
+######################################
+#Configurations was made with Ansible#
+######################################
+
+server {
+    listen       80;
+    server_name  {{ server_name }};
+    return 301 https://{{ server_name }};
+}
+server {
+    listen       443 ssl;
+    server_name  {{ server_name }};
+
+    ssl_certificate      /etc/nginx/conf.d/certs/{{ domain }}/{{ domain }}.crt;
+    ssl_certificate_key  /etc/nginx/conf.d/certs/{{ domain }}/{{ domain }}.key;
+
+
+  set $mobile_rewrite do_not_perform;
+
+    #this regex string is actually much longer to match more mobile devices
+    if ($http_user_agent ~* "(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|nexus|tablet|iPad|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|p
+ocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino") {
+        set $mobile_rewrite perform;
+    }
+
+    if ($mobile_rewrite = perform) {
+        rewrite ^ https://{{ m_server_name }}$request_uri? redirect;
+        break;
+    }
+
+
+
+    location / {
+       proxy_pass http://{{ upstream_url }};
+       proxy_set_header X-Forwarded-For $remote_addr;
+       proxy_http_version 1.1;
+       proxy_set_header HOST $host;
+       proxy_read_timeout 900s;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection "upgrade";
+       add_header Referrer-Policy "origin";
+    }
+    
+    include mime.types;
+    access_log /var/log/nginx/{{ server_name }}-access.log;
+    error_log /var/log/nginx/{{ server_name }}-error.log;
+
+    location /status {
+       stub_status on;
+       access_log off;
+       allow 127.0.0.1;
+       deny all;
+    }
+}
+

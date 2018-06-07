@@ -1,0 +1,22 @@
+#Configuring websites services
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Changes: Arman Baghajyan, Adding Nginx service check and restart
+#Date: 06/06/2018
+#Version: 1.1.1
+
+- hosts: hostname
+  vars:
+    domain_name: "domain name"
+    server_name: "{{ item.name }}"
+    upstream_url: "{{ item.url }}"
+  tasks:
+  - name: Configuring nginx Virtual host
+    template:
+       src: /root/ansible/templates/nginx/rp_service.conf.j2
+       dest: '/etc/nginx/conf.d/{{ domain_name }}/{{ item.name }}.conf'
+    loop:
+       - { name: 'domain name', url: 'proxy pass url' }
+
+
+- import_playbook: checknginx_conf.yml
+

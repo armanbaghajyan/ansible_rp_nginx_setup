@@ -1,0 +1,24 @@
+#Installing Centos Default Packeges
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Changes:
+#Date: 06/06/2018
+#Version: 1.1.0
+
+
+- hosts: hostname
+  tasks:
+  - name: Nginx repository Setup
+    template:
+       src: /root/ansible/repos/nginx.repo.j2
+       dest: /etc/yum.repos.d/nginx.repo
+  - name: Installing Nginx
+    package:
+       name: nginx
+       state: present
+  - name: Starting Nginx
+    service:
+      name: nginx
+      enabled: true
+      state: started
+
+- import_playbook: checknginx_conf.yml

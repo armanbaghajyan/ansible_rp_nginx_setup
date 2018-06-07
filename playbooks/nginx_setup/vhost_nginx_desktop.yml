@@ -1,0 +1,23 @@
+#Configuring Vhost for desktop verion
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Changes: Arman Baghajyan, Adding Nginx service check and restart
+#Date: 06/06/2018
+#Version: 1.1.0
+
+- hosts: hostname
+  vars:
+    server_name1: "{{ item.name1 }}"
+    server_name2: "{{ item.name2 }}"
+    m_server_name1: "{{ item.mobile1 }}"
+    m_server_name2: "{{ item.mobile2 }}"
+    upstream_url: "{{ item.url }}"
+  tasks:
+  - name: Configuring nginx Virtual host
+    template:
+       src: /root/ansible/templates/nginx/rp_desktop.conf.j2
+       dest: '/etc/nginx/conf.d/{{ item.name1 }}/{{ item.name1 }}.conf'
+    loop:
+       - { name1: 'domain name', name2: 'domain name', mobile1: 'domain name', mobile2: 'domain name', url: 'proxy pass url' }
+
+
+- import_playbook: checknginx_conf.yml

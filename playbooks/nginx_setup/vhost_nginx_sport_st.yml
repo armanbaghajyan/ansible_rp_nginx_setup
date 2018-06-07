@@ -1,0 +1,21 @@
+#Configuring sport statistics mobile redirection
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Changes: Arman Baghajyan, Adding Nginx service check and restart
+#Date: 06/06/2018
+#Version: 1.1.0
+
+- hosts: hostanem
+  vars:
+    server_name: "{{ item.name }}"
+    m_server_name: "{{ item.mobile }}"
+    upstream_url: "{{ item.url }}"
+    domain: "{{ item.domain }}"
+  tasks:
+  - name: Configuring nginx Virtual host for Sport Statistics
+    template:
+       src: /root/ansible/templates/nginx/sport_statistics.conf.j2
+       dest: '/etc/nginx/conf.d/{{ domain }}/{{ item.name }}.conf'
+    loop:
+       - { name: 'domain name', mobile: 'domain name', domain: 'domain name', url: 'proxy pass url' }
+
+- import_playbook: checknginx_conf.yml

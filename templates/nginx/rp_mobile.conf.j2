@@ -1,0 +1,71 @@
+######################################
+#Configurations was made with Ansible#
+######################################
+
+server {
+
+    listen       80;
+    server_name  {{ m_server_name1 }} {{ m_server_name2 }};
+
+    set $mobile_rewrite do_not_perform;
+
+    #this regex string is actually much longer to match more mobile devices
+    if ($http_user_agent ~* "(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|nexus|tablet|iPad|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino|SamsungBrowser") {
+        set $mobile_rewrite perform;
+    }
+
+    if ($mobile_rewrite = do_not_perform) {
+        rewrite ^ https://{{ server_name1 }}$request_uri? redirect;
+        break;
+    }
+    return 301 https://{{ m_server_name1 }}$request_uri;
+}
+
+server {
+    listen       443 ssl;
+    server_name  {{ m_server_name1 }} {{ m_server_name2 }};
+
+    access_log   /var/log/nginx/access-{{ m_server_name1 }}.log;
+    error_log   /var/log/nginx/error-{{ m_server_name1 }}.log;
+
+    #ssl_password_file   /etc/nginx/conf.d/pass;
+    ssl_certificate     /etc/nginx/conf.d/certs/{{ server_name1 }}/{{ server_name1 }}.crt;
+    ssl_certificate_key /etc/nginx/conf.d/certs/{{ server_name1 }}/{{ server_name1 }}.key;
+
+    set $mobile_rewrite do_not_perform;
+
+    #this regex string is actually much longer to match more mobile devices
+    if ($http_user_agent ~* "(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|nexus|tablet|iPad|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino|SamsungBrowser") {
+        set $mobile_rewrite perform;
+    }
+
+    if ($mobile_rewrite = do_not_perform) {
+        rewrite ^ https://{{ server_name1 }}$request_uri? redirect;
+        break;
+    }
+
+    location / {
+       proxy_pass http://{{ upstream_url }};
+       proxy_http_version 1.1;
+       proxy_set_header Upgrade $http_upgrade;
+       proxy_set_header Connection "upgrade";
+       proxy_set_header  Host $host;
+       proxy_set_header X-Forwarded-For $remote_addr;
+       proxy_set_header X-Real-IP $remote_addr;
+       proxy_set_header  X-Forwarded-Host $remote_addr;
+       proxy_pass_request_headers on;
+       add_header Referrer-Policy "origin";                                                                                                                                                                                                                 
+       real_ip_header X-Real-IP;                                                                                                                                                                                                                            
+       real_ip_recursive on;                                                                                                                                                                                                                                
+                                                                                                                                                                                                                                                            
+    }                                                                                                                                                                                                                                                       
+                                                                                                                                                                                                                                                            
+include mime.types;                                                                                                                                                                                                                                         
+                                                                                                                                                                                                                                                            
+   location /status {
+       stub_status on;                                                                                                                                                                                                                                      
+       access_log off;                                                                                                                                                                                                                                      
+       allow 127.0.0.1;                                                                                                                                                                                                                                     
+       deny all;                                                                                                                                                                                                                                            
+    }                                                                                                                                                                                                                                                       
+} 

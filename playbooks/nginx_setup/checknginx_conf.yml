@@ -1,0 +1,18 @@
+#This Configuration tests nginx configuration and restart nginx
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Date: 05/06/2018
+#Changes:
+#Version: 1.0.0
+
+- hosts: hostname
+  tasks:
+    - name: Getting nginx status
+      command: nginx -t
+      register: nginx_status
+
+    - debug: var=nginx_status.stdout_lines
+
+    - name: Restart Nginx
+      service: 
+         name: nginx
+         state: restarted

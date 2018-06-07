@@ -1,0 +1,18 @@
+#Setting Mime.type
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Date 04/06/2018
+#Version 1.1.0
+
+- hosts: hostname
+  tasks:
+  - name: Creationg mime.type main config file
+    template:
+       src: /root/ansible/templates/nginx/mime.type.j2
+       dest: '/etc/nginx/mime.type'
+  - name: Make changis in mime.type file
+    blockinfile:
+      path: /etc/nginx/mime.type
+      insertafter: "##########################################################"
+      content: 
+
+- import_playbook: checknginx_conf.yml

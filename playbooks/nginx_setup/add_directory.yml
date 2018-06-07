@@ -1,0 +1,17 @@
+#Create Directories recursively
+#Developers Arman Baghajyan Gurgen Martirosyan
+#Date: 05/06/2018
+#Changes:
+#Version: 1.0.1
+
+- hosts: hostname
+  tasks:
+  - name: Create Direcories
+    file:
+      path: /etc/nginx/conf.d/certs/{{ item }}
+      state: directory
+      recurse: true
+      owner: nginx
+    with_items:
+      - domain name
+
